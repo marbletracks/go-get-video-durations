@@ -210,9 +210,9 @@ func main() {
 
 	tomlPrintKnownVids(knownVideos)
 
-	saveLocalKnownVideos(knownVideos)
-
 	fillInDurations(&knownVideos)
+
+	saveLocalKnownVideos(knownVideos)
 
 	// for _, video := range playlist {
 	// 	// sometimes Snippets are nil but I am not sure why
