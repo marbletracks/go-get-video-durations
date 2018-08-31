@@ -48,6 +48,10 @@ func myVideos(knownVideos *tomlKnownVideos) []youtube.PlaylistItem {
 	client := getClient(youtube.YoutubeReadonlyScope)
 	service, err := youtube.New(client)
 	
+	// videoMeta data does not exist if there is no local data in knownvideos.toml
+	if knownVideos.Videos == nil {
+		knownVideos.Videos = make(map[string]videoMeta)
+	}
 	if err != nil {
 		log.Fatalf("Error creating YouTube client: %v", err)
 	}
