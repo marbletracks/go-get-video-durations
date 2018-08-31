@@ -189,6 +189,11 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 	printVideosListResults(response)
 
 	for _, item := range response.Items {
+		// Google returns a format like PT1H45M41S
+		// For time.ParseDuration, we have to
+		//    crop off the PT                     with [2:]
+		//    change to lower case
+		// to send something like this  1h45m41s
 		vidDuration, err := time.ParseDuration(strings.ToLower(item.ContentDetails.Duration[2:]))
 		check(err)
 
