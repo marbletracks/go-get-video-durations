@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 	"regexp"
+	"bytes"		// for debugging Encoder
 	"os"		// for Encoder
 
 	"google.golang.org/api/youtube/v3"
@@ -109,15 +110,24 @@ func check(e error) {
     }
 }
 
+func tomlPrintKnownVids(knownVideos tomlKnownVideos) {
+	buf := new(bytes.Buffer)
+	err := toml.NewEncoder(buf).Encode(knownVideos)
+	check(err)
+	fmt.Println(buf.String())
+}
+
 func main() {
 	var knownVideos tomlKnownVideos		// knownVideos will be read from local TOML file
 
 	_, err := toml.DecodeFile("/Users/thunderrabbit/mt3.com/data/playlists/livestreams/knownvideos.toml", &knownVideos)
 	check(err)
 
-	fmt.Print(knownVideos)
+	tomlPrintKnownVids(knownVideos)
 
 	playlist := myVideos(&knownVideos)
+
+	tomlPrintKnownVids(knownVideos)
 
 
 	// For more granular writes, open a file for writing.
