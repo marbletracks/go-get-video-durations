@@ -119,19 +119,16 @@ func tomlPrintKnownVids(knownVideos tomlKnownVideos) {
 	fmt.Println(buf.String())
 }
 
-func main() {
-	var knownVideos tomlKnownVideos		// knownVideos will be read from local TOML file
+func loadLocalKnownVideos() tomlKnownVideos {
+	var knownVideos tomlKnownVideos			// knownVideos will be read from local TOML file
 
 	_, err := toml.DecodeFile(localPathToKnownVideosFile, &knownVideos)
 	check(err)
 
-	tomlPrintKnownVids(knownVideos)
+	return knownVideos
+}
 
-	playlist := myVideos(&knownVideos)
-
-	tomlPrintKnownVids(knownVideos)
-
-
+func saveLocalKnownVideos(knownVideos tomlKnownVideos) {
 	// For more granular writes, open a file for writing.
 	f, err := os.Create(localPathToKnownVideosFile)
 	check(err)
@@ -142,6 +139,19 @@ func main() {
 
 	err = toml.NewEncoder(f).Encode(knownVideos);
 	check(err)
+}
+
+
+func main() {
+	knownVideos := loadLocalKnownVideos()
+
+	tomlPrintKnownVids(knownVideos)
+
+	playlist := myVideos(&knownVideos)		// send by reference because we will change it
+
+	tomlPrintKnownVids(knownVideos)
+
+	saveLocalKnownVideos(knownVideos)
 
 	for _, video := range playlist {
 		// sometimes Snippets are nil but I am not sure why
