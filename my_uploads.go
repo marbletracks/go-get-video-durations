@@ -15,8 +15,8 @@ type tomlKnownVideos struct {
 }
 
 type videoMeta struct {
-  VideoId []string
-  Title []string
+  VideoId string
+  Title string
   Uploaded time.Time // requires `import time`
   Duration time.Duration
 }
