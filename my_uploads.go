@@ -160,10 +160,11 @@ func saveLocalKnownVideos(knownVideos tomlKnownVideos) {
 	check(err)
 }
 
+
 // This will fill in up to 50 videos at a time.  50 is the limit on how many videoIDs can be sent to get their metadata
 func fillInDurations(knownVideos *tomlKnownVideos) {
 
-	limit50 := 0     					//  Make sure we don't try to load too many at once
+	limit50 := 1     					//  Make sure we don't try to load too many at once
 	videoIDs := make([]string,1)		// need to send the video IDs as a comma separated string; this might not work easily
 
 	// look through all the known videos to find those without Duration
@@ -174,6 +175,7 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 			limit50 += 1									// count toward 50 iff the video has no Duration yet
 		}
 		if limit50 == 50 {
+			fmt.Print("I have 50 video Ids. Gotta go, bye!")
 			break					// we can only do 50 at a time
 		}
 	}
