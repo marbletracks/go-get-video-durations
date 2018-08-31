@@ -3,10 +3,18 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 	"regexp"
 
 	"google.golang.org/api/youtube/v3"
 )
+
+type VideoMeta struct {
+  VideoId []string
+  Title []string
+  Uploaded time.Time // requires `import time`
+  Duration time.Duration
+}
 
 // Retrieve playlistItems in the specified playlist
 func playlistItemsList(service *youtube.Service, part string, playlistId string, pageToken string) *youtube.PlaylistItemListResponse {
