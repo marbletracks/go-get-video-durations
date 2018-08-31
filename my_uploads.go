@@ -10,7 +10,11 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-type VideoMeta struct {
+type tomlKnownVideos struct {
+	Videos map[string]videoMeta
+}
+
+type videoMeta struct {
   VideoId []string
   Title []string
   Uploaded time.Time // requires `import time`
