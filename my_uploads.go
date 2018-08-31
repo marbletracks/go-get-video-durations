@@ -87,6 +87,13 @@ func check(e error) {
 }
 
 func main() {
+	var knownVideos tomlKnownVideos		// knownVideos will be read from local TOML file
+
+	_, err := toml.DecodeFile("/Users/thunderrabbit/mt3.com/data/playlists/livestreams/knownvideos.toml", &knownVideos)
+	check(err)
+
+	fmt.Print(knownVideos)
+
 	playlist := myVideos()
 
 	for _, video := range playlist {
