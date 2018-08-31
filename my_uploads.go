@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"regexp"
 
 	"google.golang.org/api/youtube/v3"
 )
@@ -28,7 +29,9 @@ func channelsListMine(service *youtube.Service, part string) *youtube.ChannelLis
 	return response
 }
 
-func main() {
+func myVideos() []youtube.PlaylistItem {
+
+	playlist := make([]youtube.PlaylistItem, 1)
 	client := getClient(youtube.YoutubeReadonlyScope)
 	service, err := youtube.New(client)
 	
@@ -50,9 +53,7 @@ func main() {
 			playlistResponse := playlistItemsList(service, "snippet", playlistId, nextPageToken)
 			
 			for _, playlistItem := range playlistResponse.Items {
-				title := playlistItem.Snippet.Title
-				videoId := playlistItem.Snippet.ResourceId.VideoId
-				fmt.Printf("%v, (%v)\r\n", title, videoId)
+				playlist = append(playlist, *playlistItem)
 			}
 
 			// Set the token to retrieve the next page of results
@@ -61,7 +62,25 @@ func main() {
 			if nextPageToken == "" {
 				break
 			}
-			fmt.Println()
+		}
+	}
+	return playlist
+}
+
+func main() {
+	playlist := myVideos()
+
+	for _, video := range playlist {
+		// sometimes Snippets are nil but I am not sure why
+		if video.Snippet != nil {
+			videoId := video.Snippet.ResourceId.VideoId
+			title := video.Snippet.Title
+		    match, _ := regexp.MatchString("Live Stream:", title)
+		    if match {
+				fmt.Printf("%v  \"%v\" %v \r\n", videoId, title, match)
+		    } else {
+		    	fmt.Printf("%v skipped\r\n", title)
+		    }
 		}
 	}
 }
