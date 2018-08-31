@@ -175,7 +175,7 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 			limit50 += 1									// count toward 50 iff the video has no Duration yet
 		}
 		if limit50 == 50 {
-			fmt.Print("I have 50 video Ids. Gotta go, bye!")
+			fmt.Print("I have 50 video Ids. Gotta go, bye!\r\n")
 			break					// we can only do 50 at a time
 		}
 	}
@@ -209,11 +209,11 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 func main() {
 	knownVideos := loadLocalKnownVideos()
 
-	tomlPrintKnownVids(knownVideos)
+//	tomlPrintKnownVids(knownVideos)
 
 	loadNewVideosFromMyChannel(&knownVideos)		// send by reference because we will change it
 
-	tomlPrintKnownVids(knownVideos)
+//	tomlPrintKnownVids(knownVideos)
 
 	fillInDurations(&knownVideos)
 
