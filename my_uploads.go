@@ -7,6 +7,7 @@ import (
 	"regexp"
 
 	"google.golang.org/api/youtube/v3"
+	"github.com/BurntSushi/toml"
 )
 
 type VideoMeta struct {
