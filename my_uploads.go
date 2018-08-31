@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"strings"	// needed to create a string of video IDs, separated by commas
 	// "regexp"		// will be needed to parse Titles when searching for "Live Stream:"
 	"bytes"		// for debugging Encoder
 	"os"		// for Encoder
@@ -182,7 +183,7 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 	check(err)
 
 	// Call async function to load the metadata for these video IDs
-	response := videosListMultipleIds(service, "contentDetails", "Ks-_Mh1QhMc,c0KYU2j0TM4,eIho2S0ZahI")
+	response := videosListMultipleIds(service, "contentDetails", strings.Join(videoIDs,","))
 	printVideosListResults(response)
 }
 
