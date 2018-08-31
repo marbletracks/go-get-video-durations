@@ -89,12 +89,12 @@ func main() {
 		if video.Snippet != nil {
 			videoId := video.Snippet.ResourceId.VideoId
 			title := video.Snippet.Title
-		    match, _ := regexp.MatchString("Live Stream:", title)
-		    if match {
+			match, _ := regexp.MatchString("Live Stream:", title)
+			if match {
 				fmt.Printf("%v  \"%v\" %v \r\n", videoId, title, match)
-		    } else {
-		    	fmt.Printf("%v skipped\r\n", title)
-		    }
+			} else {
+				fmt.Printf("%v skipped\r\n", title)
+			}
 		}
 	}
 }
