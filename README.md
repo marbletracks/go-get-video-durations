@@ -1,3 +1,9 @@
+
+README.ROB:
+
+    cd ~/mt3.com/scripts/go
+    go run my_uploads.go errors.go oauth2.go
+
 Recommended Go version: latest version
 
 To run these code samples, you will need to install the dependent libraries via
