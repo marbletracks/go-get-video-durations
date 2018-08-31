@@ -102,17 +102,17 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 				vidDuration, err := time.ParseDuration("0ms")		// TODO put actual number here if they ever make this data available https://issuetracker.google.com/issues/35170788
 				check(err)
 
-				// Save video information into knownVideos so we can save it to disk
-				// after getting the duration, which is actually the whole point of this thing.
-				// Eventually we will ask knownVideos if the information is already known
-				// and use that to decide if we keep going through pages of videos
-				knownVideos.Videos[playlistItem.Snippet.ResourceId.VideoId] =
-					videoMeta{
-						VideoId:playlistItem.Snippet.ResourceId.VideoId,
-						Title:playlistItem.Snippet.Title,
-						Published:vidPublishTime,
-						Duration:vidDuration,
-					}
+				// Save video information into knownVideos only if it does not exist
+				//    (if it exists, we would overwrite the duration with 0)
+				if _, exists := knownVideos.Videos[playlistItem.Snippet.ResourceId.VideoId]; !exists {
+					knownVideos.Videos[playlistItem.Snippet.ResourceId.VideoId] =
+						videoMeta{
+							VideoId:playlistItem.Snippet.ResourceId.VideoId,
+							Title:playlistItem.Snippet.Title,
+							Published:vidPublishTime,
+							Duration:vidDuration,
+						}
+				}
 			}
 
 			// Set the token to retrieve the next page of results
