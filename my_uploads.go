@@ -102,9 +102,11 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 				vidDuration, err := time.ParseDuration("0ms")		// TODO put actual number here if they ever make this data available https://issuetracker.google.com/issues/35170788
 				check(err)
 
+				// See if the video key we loaded from Youtube's API is already known to us
+				_, exists := knownVideos.Videos[playlistItem.Snippet.ResourceId.VideoId]
 				// Save video information into knownVideos only if it does not exist
 				//    (if it exists, we would overwrite the duration with 0)
-				if _, exists := knownVideos.Videos[playlistItem.Snippet.ResourceId.VideoId]; !exists {
+				if !exists {
 					knownVideos.Videos[playlistItem.Snippet.ResourceId.VideoId] =
 						videoMeta{
 							VideoId:playlistItem.Snippet.ResourceId.VideoId,
