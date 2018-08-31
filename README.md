@@ -12,7 +12,7 @@ To run any sample that does not require user authorization, such as search\_by\_
 you need to replace the value of the `developerKey` constant with a valid API key:
 
 ```
-const developerKey = "AIzaSyAS4w5QCFC9quIXejSkffSB0xQJR1MFjA8"
+const developerKey = "YOUR DEVELOPER KEY"
 ```
 
 To run any sample that requires authorization on behalf of a user, such as retrieving the
