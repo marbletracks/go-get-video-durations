@@ -42,7 +42,7 @@ func channelsListMine(service *youtube.Service, part string) *youtube.ChannelLis
 	return response
 }
 
-func myVideos() []youtube.PlaylistItem {
+func myVideos(knownVideos *tomlKnownVideos) []youtube.PlaylistItem {
 
 	playlist := make([]youtube.PlaylistItem, 1)
 	client := getClient(youtube.YoutubeReadonlyScope)
@@ -94,7 +94,7 @@ func main() {
 
 	fmt.Print(knownVideos)
 
-	playlist := myVideos()
+	playlist := myVideos(&knownVideos)
 
 	for _, video := range playlist {
 		// sometimes Snippets are nil but I am not sure why
