@@ -63,7 +63,7 @@ func myVideos(knownVideos *tomlKnownVideos) []youtube.PlaylistItem {
 		nextPageToken := ""
 		for {
 			// Retrieve next set of items in the playlist.
-			playlistResponse := playlistItemsList(service, "snippet", playlistId, nextPageToken)
+			playlistResponse := playlistItemsList(service, "snippet,ContentDetails", playlistId, nextPageToken)
 			
 			for _, playlistItem := range playlistResponse.Items {
 				playlist = append(playlist, *playlistItem)
