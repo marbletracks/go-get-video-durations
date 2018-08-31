@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"time"
-	"regexp"
+	// "regexp"		// will be needed to parse Titles when searching for "Live Stream:"
 	"bytes"		// for debugging Encoder
 	"os"		// for Encoder
 
@@ -46,9 +46,8 @@ func channelsListMine(service *youtube.Service, part string) *youtube.ChannelLis
 	return response
 }
 
-func myVideos(knownVideos *tomlKnownVideos) []youtube.PlaylistItem {
+func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 
-	playlist := make([]youtube.PlaylistItem, 1)
 	client := getClient(youtube.YoutubeReadonlyScope)
 	service, err := youtube.New(client)
 	
@@ -74,7 +73,6 @@ func myVideos(knownVideos *tomlKnownVideos) []youtube.PlaylistItem {
 			playlistResponse := playlistItemsList(service, "snippet,ContentDetails", playlistId, nextPageToken)
 			
 			for _, playlistItem := range playlistResponse.Items {
-				playlist = append(playlist, *playlistItem)
 				// Thanks to https://github.com/go-shadow/moment/blob/master/moment.go for the format that must be used
 				// https://golang.org/src/time/format.go?s=37668:37714#L735
 				vidPublishTime, err := time.Parse("2006-01-02T15:04:05Z0700",playlistItem.ContentDetails.VideoPublishedAt)
@@ -103,7 +101,6 @@ func myVideos(knownVideos *tomlKnownVideos) []youtube.PlaylistItem {
 			}
 		}
 	}
-	return playlist
 }
 
 func check(e error) {
@@ -147,23 +144,23 @@ func main() {
 
 	tomlPrintKnownVids(knownVideos)
 
-	playlist := myVideos(&knownVideos)		// send by reference because we will change it
+	loadNewVideosFromMyChannel(&knownVideos)		// send by reference because we will change it
 
 	tomlPrintKnownVids(knownVideos)
 
 	saveLocalKnownVideos(knownVideos)
 
-	for _, video := range playlist {
-		// sometimes Snippets are nil but I am not sure why
-		if video.Snippet != nil {
-			videoId := video.Snippet.ResourceId.VideoId
-			title := video.Snippet.Title
-			match, _ := regexp.MatchString("Live Stream:", title)
-			if match {
-				fmt.Printf("%v  \"%v\" %v \r\n", videoId, title, match)
-			} else {
-				fmt.Printf("%v skipped\r\n", title)
-			}
-		}
-	}
+	// for _, video := range playlist {
+	// 	// sometimes Snippets are nil but I am not sure why
+	// 	if video.Snippet != nil {
+	// 		videoId := video.Snippet.ResourceId.VideoId
+	// 		title := video.Snippet.Title
+	// 		match, _ := regexp.MatchString("Live Stream:", title)
+	// 		if match {
+	// 			fmt.Printf("%v  \"%v\" %v \r\n", videoId, title, match)
+	// 		} else {
+	// 			fmt.Printf("%v skipped\r\n", title)
+	// 		}
+	// 	}
+	// }
 }
