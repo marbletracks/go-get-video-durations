@@ -185,6 +185,18 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 	// Call async function to load the metadata for these video IDs
 	response := videosListMultipleIds(service, "contentDetails", strings.Join(videoIDs,","))
 	printVideosListResults(response)
+
+	for _, item := range response.Items {
+		vidDuration, err := time.ParseDuration(strings.ToLower(item.ContentDetails.Duration[2:]))
+		check(err)
+
+		// https://stackoverflow.com/a/17443950/194309
+		// I wanted to do this		knownVideos.Videos[item.Id].Duration = item.ContentDetails.Duration
+		// but that gives an error.   Have to do this
+		vid := knownVideos.Videos[item.Id]
+		vid.Duration = vidDuration
+		knownVideos.Videos[item.Id] = vid
+	}
 }
 
 func main() {
