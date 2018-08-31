@@ -15,7 +15,8 @@ var (
 	maxResults = flag.Int64("max-results", 25, "Max YouTube results")
 )
 
-const developerKey = "AIzaSyAS4w5QCFC9quIXejSkffSB0xQJR1MFjA8"
+// create key at https://console.developers.google.com/apis/credentials
+const developerKey = "YOUR DEVELOPER KEY"
 
 func main() {
 	flag.Parse()
