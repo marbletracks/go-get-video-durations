@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 	"regexp"
+	"os"		// for Encoder
 
 	"google.golang.org/api/youtube/v3"
 	"github.com/BurntSushi/toml"
@@ -117,6 +118,18 @@ func main() {
 	fmt.Print(knownVideos)
 
 	playlist := myVideos(&knownVideos)
+
+
+	// For more granular writes, open a file for writing.
+	f, err := os.Create("/Users/thunderrabbit/mt3.com/data/playlists/livestreams/knownvideos.toml")
+	check(err)
+
+	// It's idiomatic to defer a `Close` immediately
+	// after opening a file.
+	defer f.Close()
+
+	err = toml.NewEncoder(f).Encode(knownVideos);
+	check(err)
 
 	for _, video := range playlist {
 		// sometimes Snippets are nil but I am not sure why
