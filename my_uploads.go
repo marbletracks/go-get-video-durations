@@ -177,8 +177,13 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 		}
 	}
 
+	client := getClient(youtube.YoutubeReadonlyScope)
+	service, err := youtube.New(client)
+	check(err)
+
 	// Call async function to load the metadata for these video IDs
-	fmt.Print(videoIDs)
+	response := videosListMultipleIds(service, "contentDetails", "Ks-_Mh1QhMc,c0KYU2j0TM4,eIho2S0ZahI")
+	printVideosListResults(response)
 }
 
 func main() {
