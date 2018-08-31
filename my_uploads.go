@@ -71,6 +71,24 @@ func myVideos(knownVideos *tomlKnownVideos) []youtube.PlaylistItem {
 			
 			for _, playlistItem := range playlistResponse.Items {
 				playlist = append(playlist, *playlistItem)
+				// Thanks to https://github.com/go-shadow/moment/blob/master/moment.go for the format that must be used
+				// https://golang.org/src/time/format.go?s=37668:37714#L735
+				vidPublishTime, err := time.Parse("2006-01-02T15:04:05Z0700",playlistItem.ContentDetails.VideoPublishedAt)
+				check(err)
+				vidDuration, err := time.ParseDuration("0ms")		// in case they ever make this data available
+				check(err)
+
+				// Save video information into knownVideos so we can save it to disk
+				// after getting the duration, which is actually the whole point of this thing.
+				// Eventually we will ask knownVideos if the information is already known
+				// and use that to decide if we keep going through pages of videos
+				knownVideos.Videos[playlistItem.Snippet.ResourceId.VideoId] =
+					videoMeta{
+						VideoId:playlistItem.Snippet.ResourceId.VideoId,
+						Title:playlistItem.Snippet.Title,
+						Published:vidPublishTime,
+						Duration:vidDuration,
+					}
 			}
 
 			// Set the token to retrieve the next page of results
