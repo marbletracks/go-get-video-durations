@@ -25,6 +25,27 @@ type videoMeta struct {
   Duration time.Duration
 }
 
+// from https://developers.google.com/youtube/v3/docs/videos/list
+// temp code to examine response
+func printVideosListResults(response *youtube.VideoListResponse) {
+	for _, item := range response.Items {
+		fmt.Println(item.Id, ":", item.ContentDetails.Duration)
+	}
+}
+
+// from https://developers.google.com/youtube/v3/docs/videos/list
+// Used ONLY to get the Durations of videos because https://issuetracker.google.com/issues/35170788
+// Thanks https://stackoverflow.com/questions/15596753/youtube-api-v3-how-to-get-video-durations
+func videosListMultipleIds(service *youtube.Service, part string, id string) *youtube.VideoListResponse {
+	call := service.Videos.List(part)
+	if id != "" {
+		call = call.Id(id)
+	}
+	response, err := call.Do()
+	handleError(err, "")
+	return response
+}
+
 // Retrieve playlistItems in the specified playlist
 func playlistItemsList(service *youtube.Service, part string, playlistId string, pageToken string) *youtube.PlaylistItemListResponse {
 	call := service.PlaylistItems.List(part)
