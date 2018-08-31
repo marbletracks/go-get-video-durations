@@ -79,7 +79,7 @@ func myVideos(knownVideos *tomlKnownVideos) []youtube.PlaylistItem {
 				// https://golang.org/src/time/format.go?s=37668:37714#L735
 				vidPublishTime, err := time.Parse("2006-01-02T15:04:05Z0700",playlistItem.ContentDetails.VideoPublishedAt)
 				check(err)
-				vidDuration, err := time.ParseDuration("0ms")		// in case they ever make this data available
+				vidDuration, err := time.ParseDuration("0ms")		// TODO put actual number here if they ever make this data available https://issuetracker.google.com/issues/35170788
 				check(err)
 
 				// Save video information into knownVideos so we can save it to disk
