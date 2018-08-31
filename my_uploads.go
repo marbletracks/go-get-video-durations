@@ -138,6 +138,27 @@ func saveLocalKnownVideos(knownVideos tomlKnownVideos) {
 	check(err)
 }
 
+// This will fill in up to 50 videos at a time.  50 is the limit on how many videoIDs can be sent to get their metadata
+func fillInDurations(knownVideos *tomlKnownVideos) {
+
+	limit50 := 0     					//  Make sure we don't try to load too many at once
+	videoIDs := make([]string,1)		// need to send the video IDs as a comma separated string; this might not work easily
+
+	// look through all the known videos to find those without Duration
+	// so we can load the duration from Youtube API in this lovely separate call
+	for _, video := range knownVideos.Videos {
+		if video.Duration == 0 {
+			videoIDs = append(videoIDs, video.VideoId)		// add to list of IDs we must look up the duration
+			limit50 += 1									// count toward 50 iff the video has no Duration yet
+		}
+		if limit50 == 50 {
+			break					// we can only do 50 at a time
+		}
+	}
+
+	// Call async function to load the metadata for these video IDs
+	fmt.Print(videoIDs)
+}
 
 func main() {
 	knownVideos := loadLocalKnownVideos()
@@ -149,6 +170,8 @@ func main() {
 	tomlPrintKnownVids(knownVideos)
 
 	saveLocalKnownVideos(knownVideos)
+
+	fillInDurations(&knownVideos)
 
 	// for _, video := range playlist {
 	// 	// sometimes Snippets are nil but I am not sure why
