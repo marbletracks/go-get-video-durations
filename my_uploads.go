@@ -12,6 +12,8 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+const localPathToKnownVideosFile = "/Users/thunderrabbit/mt3.com/data/playlists/livestreams/knownvideos.toml"
+
 type tomlKnownVideos struct {
 	Videos map[string]videoMeta
 }
@@ -120,7 +122,7 @@ func tomlPrintKnownVids(knownVideos tomlKnownVideos) {
 func main() {
 	var knownVideos tomlKnownVideos		// knownVideos will be read from local TOML file
 
-	_, err := toml.DecodeFile("/Users/thunderrabbit/mt3.com/data/playlists/livestreams/knownvideos.toml", &knownVideos)
+	_, err := toml.DecodeFile(localPathToKnownVideosFile, &knownVideos)
 	check(err)
 
 	tomlPrintKnownVids(knownVideos)
@@ -131,7 +133,7 @@ func main() {
 
 
 	// For more granular writes, open a file for writing.
-	f, err := os.Create("/Users/thunderrabbit/mt3.com/data/playlists/livestreams/knownvideos.toml")
+	f, err := os.Create(localPathToKnownVideosFile)
 	check(err)
 
 	// It's idiomatic to defer a `Close` immediately
