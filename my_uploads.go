@@ -68,6 +68,9 @@ func channelsListMine(service *youtube.Service, part string) *youtube.ChannelLis
 	return response
 }
 
+// knownVideos is the list of videos in our local TOML file
+// playlistItem is one of the myriad videos in my channel
+// This looks at each video ID to see if we need to add it to knownVideos
 func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKnownVideos) {
 	// Thanks to https://github.com/go-shadow/moment/blob/master/moment.go for the format that must be used
 	// https://golang.org/src/time/format.go?s=37668:37714#L735
@@ -91,6 +94,8 @@ func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKno
 	}
 }
 
+// Download from Youtube all the videos in my channel
+// so we can look for new ones that do not exist in local TOML file
 func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 
 	client := getClient(youtube.YoutubeReadonlyScope)
