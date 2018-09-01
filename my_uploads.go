@@ -35,12 +35,6 @@ type videoMeta struct {
   VideoType MT3VideoType
 }
 
-// from https://developers.google.com/youtube/v3/docs/videos/list
-// temp code to examine response
-func printVideosListResults(response *youtube.VideoListResponse) {
-	for _, item := range response.Items {
-		fmt.Println(item.Id, ":", item.ContentDetails.Duration)
-	}
 }
 
 // from https://developers.google.com/youtube/v3/docs/videos/list
@@ -224,7 +218,6 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 
 	// Call async function to load the metadata for these video IDs
 	response := videosListMultipleIds(service, "contentDetails", videoIDs)
-	printVideosListResults(response)
 
 	for _, item := range response.Items {
 		// Google returns a format like PT1H45M41S
