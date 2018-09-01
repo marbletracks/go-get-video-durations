@@ -162,9 +162,8 @@ func saveLocalKnownVideos(knownVideos tomlKnownVideos) {
 	check(err)
 }
 
-
-// This will fill in up to 50 videos at a time.  50 is the limit on how many videoIDs can be sent to get their metadata
-func fillInDurations(knownVideos *tomlKnownVideos) {
+// returns string of comma-separated video IDs
+func returnUpTo50VideosWithEmptyDuration(knownVideos *tomlKnownVideos) string {
 
 	limit50 := 1     					//  Make sure we don't try to load too many at once
 	videoIDs := make([]string,1)		// need to send the video IDs as a comma separated string; this might not work easily
@@ -181,13 +180,20 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 			break					// we can only do 50 at a time
 		}
 	}
+	return strings.Join(videoIDs,",")
+}
+
+// This will fill in up to 50 videos at a time.  50 is the limit on how many videoIDs can be sent to get their metadata
+func fillInDurations(knownVideos *tomlKnownVideos) {
 
 	client := getClient(youtube.YoutubeReadonlyScope)
 	service, err := youtube.New(client)
 	check(err)
 
+	videoIDs := returnUpTo50VideosWithEmptyDuration(knownVideos)
+
 	// Call async function to load the metadata for these video IDs
-	response := videosListMultipleIds(service, "contentDetails", strings.Join(videoIDs,","))
+	response := videosListMultipleIds(service, "contentDetails", videoIDs)
 	printVideosListResults(response)
 
 	for _, item := range response.Items {
