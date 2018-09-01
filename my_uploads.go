@@ -16,17 +16,20 @@ import (
 const localPathToKnownVideosFile = "/Users/thunderrabbit/mt3.com/data/playlists/knownvideos.toml"
 
 type MT3VideoType uint8
-
+// Hugo will do different things with different types of videos
 const (
 	Unknown MT3VideoType = iota
 	Livestream
 	Snippet
 )
 
+// This is the structure to be used in localPathToKnownVideosFile
 type tomlKnownVideos struct {
 	Videos map[string]videoMeta
 }
 
+// Each video will have basic data.
+// Duration will allow me to report just how long I have spent on Marble Track 3
 type videoMeta struct {
   VideoId string
   Title string
@@ -155,6 +158,7 @@ func check(e error) {
     }
 }
 
+// for debugging, but not currently used
 func tomlPrintKnownVids(knownVideos tomlKnownVideos) {
 	buf := new(bytes.Buffer)
 	err := toml.NewEncoder(buf).Encode(knownVideos)
@@ -162,6 +166,8 @@ func tomlPrintKnownVids(knownVideos tomlKnownVideos) {
 	fmt.Println(buf.String())
 }
 
+// a TOML list of videos is stored locally to reduce the number of times we have to contact Youtube API
+// This loads the file and returns as a struct of type tomlKnownVideos
 func loadLocalKnownVideos() tomlKnownVideos {
 	var knownVideos tomlKnownVideos			// knownVideos will be read from local TOML file
 
@@ -171,6 +177,9 @@ func loadLocalKnownVideos() tomlKnownVideos {
 	return knownVideos
 }
 
+
+// a TOML list of videos is stored locally to reduce the number of times we have to contact Youtube API
+// This saves the file
 func saveLocalKnownVideos(knownVideos tomlKnownVideos) {
 	// For more granular writes, open a file for writing.
 	f, err := os.Create(localPathToKnownVideosFile)
@@ -185,6 +194,7 @@ func saveLocalKnownVideos(knownVideos tomlKnownVideos) {
 }
 
 // returns string of comma-separated video IDs
+// The IDs will be sent to YouTube API to get the video Durations
 func returnUpTo50VideosWithEmptyDuration(knownVideos *tomlKnownVideos) string {
 
 	limit50 := 1     					//  Make sure we don't try to load too many at once
@@ -218,11 +228,11 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 	response := videosListMultipleIds(service, "contentDetails", videoIDs)
 
 	for _, item := range response.Items {
-		// Google returns a format like PT1H45M41S
-		// For time.ParseDuration, we have to
-		//    crop off the PT                     with [2:]
+		// Google returns a format like PT1H45M41S for the Duration
+		// For time.ParseDuration, we have to:
+		//    crop off the PT using [2:]
 		//    change to lower case
-		// to send something like this  1h45m41s
+		// to send something like this:  1h45m41s
 		vidDuration, err := time.ParseDuration(strings.ToLower(item.ContentDetails.Duration[2:]))
 		check(err)
 
@@ -240,11 +250,11 @@ func main() {
 
 //	tomlPrintKnownVids(knownVideos)
 
-	loadNewVideosFromMyChannel(&knownVideos)		// send by reference because we will change it
+	loadNewVideosFromMyChannel(&knownVideos)		// send by reference because we will add new videos from Youtube
 
 //	tomlPrintKnownVids(knownVideos)
 
-	fillInDurations(&knownVideos)
+	fillInDurations(&knownVideos)					// send by reference so we can update the Durations
 
 	saveLocalKnownVideos(knownVideos)
 }
