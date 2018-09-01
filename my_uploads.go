@@ -52,8 +52,12 @@ func videosListMultipleIds(service *youtube.Service, part string, id string) *yo
 }
 
 // Retrieve playlistItems in the specified playlist
-func playlistItemsList(service *youtube.Service, part string, playlistId string, pageToken string) *youtube.PlaylistItemListResponse {
+// This does not reliably returns the items sorted by published date.  (it is close, but not perfect)
+// If they were returned in sorted order, I could skip calling next page when I started getting hits on knownVideos
+// Incorrect sort might be related to https://issuetracker.google.com/issues/35176658
+func playlistItemsList(service *youtube.Service, part string, playlistId string, pageToken string, numItems int64) *youtube.PlaylistItemListResponse {
 	call := service.PlaylistItems.List(part)
+	call = call.MaxResults(numItems)			// Hopefully speed things overall by requiring fewer calls  (default 5, max 50)
 	call = call.PlaylistId(playlistId)
 	if pageToken != "" {
 		call = call.PageToken(pageToken)
@@ -86,7 +90,8 @@ func determineVideoTypeBasedOnTitle(title string) MT3VideoType {
 // knownVideos is the list of videos in our local TOML file
 // playlistItem is one of the myriad videos in my channel
 // This looks at each video ID to see if we need to add it to knownVideos
-func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKnownVideos) {
+func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKnownVideos) bool {
+	foundNewVideos := false
 	// Thanks to https://github.com/go-shadow/moment/blob/master/moment.go for the format that must be used
 	// https://golang.org/src/time/format.go?s=37668:37714#L735
 	vidPublishTime, err := time.Parse("2006-01-02T15:04:05Z0700",playlistItem.ContentDetails.VideoPublishedAt)
@@ -99,6 +104,7 @@ func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKno
 	// Save video information into knownVideos only if it does not exist
 	//    (if it exists, we would overwrite the duration with 0)
 	if !exists {
+		foundNewVideos = true
 		knownVideos.Videos[playlistItem.Snippet.ResourceId.VideoId] =
 			videoMeta{
 				VideoId:playlistItem.Snippet.ResourceId.VideoId,
@@ -108,6 +114,7 @@ func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKno
 				VideoType:determineVideoTypeBasedOnTitle(playlistItem.Snippet.Title),
 			}
 	}
+	return foundNewVideos
 }
 
 // Download from Youtube all the videos in my channel
@@ -134,18 +141,29 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 		fmt.Printf("Checking for new videos in list %s\r\n", playlistId)
 
 		nextPageToken := ""
+		var numItemsPerPage int64 = 5			// max 50 https://developers.google.com/youtube/v3/docs/playlistItems/list#parameters
+		foundNewVideos := false					// if we added videos, we will look for next page of videos
 		for {
 			// Retrieve next set of items in the playlist.
-			playlistResponse := playlistItemsList(service, "snippet,ContentDetails", playlistId, nextPageToken)
+			// Items are not returned in perfectly sorted order, so just go through all pages to get all items
+			// Revisit this if it gets too slow
+			playlistResponse := playlistItemsList(service, "snippet,ContentDetails", playlistId, nextPageToken, numItemsPerPage)
 			
 			for _, playlistItem := range playlistResponse.Items {
-				addNewVideosToList(playlistItem, knownVideos)
+				foundNewVideos = addNewVideosToList(playlistItem, knownVideos)
 			}
 
+			if foundNewVideos {
+				fmt.Println("Found some new videos.  Let's look for more!")
+			} else {
+				fmt.Printf("Searched %v videos and found nothing new.  Let's move on.\r\n",numItemsPerPage)
+				// The results are not exactly ordered by publishDate, so there could be cases where we didn't find expected videos
+				fmt.Println("If we should have found some, increase numItemsPerPage or remove \"!foundNewVideos ||\" from code")
+			}
 			// Set the token to retrieve the next page of results
-			// or exit the loop if all results have been retrieved.
+			// or exit the loop if all results have (apparently) been retrieved.
 			nextPageToken = playlistResponse.NextPageToken
-			if nextPageToken == "" {
+			if !foundNewVideos || nextPageToken == "" {
 				break
 			}
 		}
