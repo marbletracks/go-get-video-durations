@@ -91,7 +91,6 @@ func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKno
 	// https://golang.org/src/time/format.go?s=37668:37714#L735
 	vidPublishTime, err := time.Parse("2006-01-02T15:04:05Z0700",playlistItem.ContentDetails.VideoPublishedAt)
 	check(err)
-	fmt.Println(vidPublishTime)							// The vids are not returned in date order, but close to it
 	vidDuration, err := time.ParseDuration("0ms")		// TODO put actual number here if they ever make this data available https://issuetracker.google.com/issues/35170788
 	check(err)
 
