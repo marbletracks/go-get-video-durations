@@ -52,6 +52,8 @@ func videosListMultipleIds(service *youtube.Service, part string, id string) *yo
 }
 
 // Retrieve playlistItems in the specified playlist
+// This does not reliably returns the items sorted by published date.  (it is close, but not perfect)
+// If they were returned in sorted order, I could skip calling next page when I started getting hits on knownVideos
 func playlistItemsList(service *youtube.Service, part string, playlistId string, pageToken string) *youtube.PlaylistItemListResponse {
 	call := service.PlaylistItems.List(part)
 	call = call.PlaylistId(playlistId)
@@ -136,6 +138,8 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 		nextPageToken := ""
 		for {
 			// Retrieve next set of items in the playlist.
+			// Items are not returned in perfectly sorted order, so just go through all pages to get all items
+			// Revisit this if it gets too slow
 			playlistResponse := playlistItemsList(service, "snippet,ContentDetails", playlistId, nextPageToken)
 			
 			for _, playlistItem := range playlistResponse.Items {
