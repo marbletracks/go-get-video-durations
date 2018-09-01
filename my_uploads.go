@@ -89,7 +89,8 @@ func determineVideoTypeBasedOnTitle(title string) MT3VideoType {
 // knownVideos is the list of videos in our local TOML file
 // playlistItem is one of the myriad videos in my channel
 // This looks at each video ID to see if we need to add it to knownVideos
-func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKnownVideos) {
+func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKnownVideos) bool {
+	foundNewVideos := false
 	// Thanks to https://github.com/go-shadow/moment/blob/master/moment.go for the format that must be used
 	// https://golang.org/src/time/format.go?s=37668:37714#L735
 	vidPublishTime, err := time.Parse("2006-01-02T15:04:05Z0700",playlistItem.ContentDetails.VideoPublishedAt)
@@ -102,6 +103,7 @@ func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKno
 	// Save video information into knownVideos only if it does not exist
 	//    (if it exists, we would overwrite the duration with 0)
 	if !exists {
+		foundNewVideos = true
 		knownVideos.Videos[playlistItem.Snippet.ResourceId.VideoId] =
 			videoMeta{
 				VideoId:playlistItem.Snippet.ResourceId.VideoId,
@@ -111,6 +113,7 @@ func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKno
 				VideoType:determineVideoTypeBasedOnTitle(playlistItem.Snippet.Title),
 			}
 	}
+	return foundNewVideos
 }
 
 // Download from Youtube all the videos in my channel
@@ -138,6 +141,7 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 
 		nextPageToken := ""
 		var numItemsPerPage int64 = 5			// max 50 https://developers.google.com/youtube/v3/docs/playlistItems/list#parameters
+		foundNewVideos := false					// if we added videos, we will look for next page of videos
 		for {
 			// Retrieve next set of items in the playlist.
 			// Items are not returned in perfectly sorted order, so just go through all pages to get all items
@@ -145,7 +149,7 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 			playlistResponse := playlistItemsList(service, "snippet,ContentDetails", playlistId, nextPageToken, numItemsPerPage)
 			
 			for _, playlistItem := range playlistResponse.Items {
-				addNewVideosToList(playlistItem, knownVideos)
+				foundNewVideos = addNewVideosToList(playlistItem, knownVideos)
 			}
 
 			// Set the token to retrieve the next page of results
