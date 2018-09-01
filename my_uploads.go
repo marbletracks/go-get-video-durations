@@ -152,10 +152,17 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 				foundNewVideos = addNewVideosToList(playlistItem, knownVideos)
 			}
 
+			if foundNewVideos {
+				fmt.Println("Found some new videos.  Let's look for more!")
+			} else {
+				fmt.Printf("Searched %v videos and found nothing new.  Let's move on.\r\n",numItemsPerPage)
+				// The results are not exactly ordered by publishDate, so there could be cases where we didn't find expected videos
+				fmt.Println("If we should have found some, increase numItemsPerPage or remove \"!foundNewVideos ||\" from code")
+			}
 			// Set the token to retrieve the next page of results
-			// or exit the loop if all results have been retrieved.
+			// or exit the loop if all results have (apparently) been retrieved.
 			nextPageToken = playlistResponse.NextPageToken
-			if nextPageToken == "" {
+			if !foundNewVideos || nextPageToken == "" {
 				break
 			}
 		}
