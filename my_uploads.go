@@ -131,7 +131,7 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 		playlistId := channel.ContentDetails.RelatedPlaylists.Uploads
 		
 		// Print the playlist ID for the list of uploaded videos.
-		fmt.Printf("Videos in list %s\r\n", playlistId)
+		fmt.Printf("Checking for new videos in list %s\r\n", playlistId)
 
 		nextPageToken := ""
 		for {
