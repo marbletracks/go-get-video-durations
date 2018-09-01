@@ -54,6 +54,7 @@ func videosListMultipleIds(service *youtube.Service, part string, id string) *yo
 // Retrieve playlistItems in the specified playlist
 // This does not reliably returns the items sorted by published date.  (it is close, but not perfect)
 // If they were returned in sorted order, I could skip calling next page when I started getting hits on knownVideos
+// Incorrect sort might be related to https://issuetracker.google.com/issues/35176658
 func playlistItemsList(service *youtube.Service, part string, playlistId string, pageToken string, numItems int64) *youtube.PlaylistItemListResponse {
 	call := service.PlaylistItems.List(part)
 	call = call.MaxResults(numItems)			// Hopefully speed things overall by requiring fewer calls  (default 5, max 50)
