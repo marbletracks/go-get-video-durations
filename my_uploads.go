@@ -13,7 +13,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-const localPathToKnownVideosFile = "/Users/thunderrabbit/mt3.com/data/playlists/livestreams/knownvideos.toml"
+const localPathToKnownVideosFile = "/Users/thunderrabbit/mt3.com/data/playlists/knownvideos.toml"
 
 type MT3VideoType uint8
 
