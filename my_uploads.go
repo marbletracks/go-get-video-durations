@@ -56,6 +56,7 @@ func videosListMultipleIds(service *youtube.Service, part string, id string) *yo
 // If they were returned in sorted order, I could skip calling next page when I started getting hits on knownVideos
 func playlistItemsList(service *youtube.Service, part string, playlistId string, pageToken string) *youtube.PlaylistItemListResponse {
 	call := service.PlaylistItems.List(part)
+	call = call.MaxResults(50)			// Hopefully speed things overall by requiring fewer calls  (default 5, max 50)
 	call = call.PlaylistId(playlistId)
 	if pageToken != "" {
 		call = call.PageToken(pageToken)
