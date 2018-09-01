@@ -190,7 +190,13 @@ func loadLocalKnownVideos() tomlKnownVideos {
 	var knownVideos tomlKnownVideos			// knownVideos will be read from local TOML file
 
 	_, err := toml.DecodeFile(localPathToKnownVideosFile, &knownVideos)
-	check(err)
+	if(err != nil) {
+		fmt.Println("Error while loading knownVideos.TOML:")
+		fmt.Println(localPathToKnownVideosFile)
+		fmt.Println("Should remove '!foundNewVideos ||' and increase numItemsPerPage to 50 then rerun until rebuilt")
+		var emptyKnownVideos tomlKnownVideos
+		return emptyKnownVideos
+	}
 
 	return knownVideos
 }
