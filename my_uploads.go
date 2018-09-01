@@ -15,6 +15,14 @@ import (
 
 const localPathToKnownVideosFile = "/Users/thunderrabbit/mt3.com/data/playlists/livestreams/knownvideos.toml"
 
+type MT3VideoType uint8
+
+const (
+	Unknown MT3VideoType = iota
+	Livestream
+	Snippet
+)
+
 type tomlKnownVideos struct {
 	Videos map[string]videoMeta
 }
@@ -24,6 +32,7 @@ type videoMeta struct {
   Title string
   Published time.Time // requires `import time`
   Duration time.Duration
+  VideoType MT3VideoType
 }
 
 // from https://developers.google.com/youtube/v3/docs/videos/list
@@ -69,13 +78,14 @@ func channelsListMine(service *youtube.Service, part string) *youtube.ChannelLis
 }
 
 // this needs to return something, basically an enum
-func determineVideoTypeBasedOnTitle(title string) {
+func determineVideoTypeBasedOnTitle(title string) MT3VideoType {
 	match, _ := regexp.MatchString("Live Stream:", title)
 	if match {
-		fmt.Printf("\"%v\" %v \r\n", title, match)
+		return Livestream
 	} else {
-		fmt.Printf("skipped\r\n")
+		return Snippet
 	}
+	return Unknown
 }
 
 // knownVideos is the list of videos in our local TOML file
@@ -100,10 +110,9 @@ func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKno
 				Title:playlistItem.Snippet.Title,
 				Published:vidPublishTime,
 				Duration:vidDuration,
+				VideoType:determineVideoTypeBasedOnTitle(playlistItem.Snippet.Title),
 			}
 	}
-	// this needs to return something, and go up inside videoMeta {}
-	determineVideoTypeBasedOnTitle(playlistItem.Snippet.Title)
 }
 
 // Download from Youtube all the videos in my channel
