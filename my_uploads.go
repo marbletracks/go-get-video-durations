@@ -54,9 +54,9 @@ func videosListMultipleIds(service *youtube.Service, part string, id string) *yo
 // Retrieve playlistItems in the specified playlist
 // This does not reliably returns the items sorted by published date.  (it is close, but not perfect)
 // If they were returned in sorted order, I could skip calling next page when I started getting hits on knownVideos
-func playlistItemsList(service *youtube.Service, part string, playlistId string, pageToken string) *youtube.PlaylistItemListResponse {
+func playlistItemsList(service *youtube.Service, part string, playlistId string, pageToken string, numItems int64) *youtube.PlaylistItemListResponse {
 	call := service.PlaylistItems.List(part)
-	call = call.MaxResults(50)			// Hopefully speed things overall by requiring fewer calls  (default 5, max 50)
+	call = call.MaxResults(numItems)			// Hopefully speed things overall by requiring fewer calls  (default 5, max 50)
 	call = call.PlaylistId(playlistId)
 	if pageToken != "" {
 		call = call.PageToken(pageToken)
@@ -137,11 +137,12 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 		fmt.Printf("Checking for new videos in list %s\r\n", playlistId)
 
 		nextPageToken := ""
+		var numItemsPerPage int64 = 5			// max 50 https://developers.google.com/youtube/v3/docs/playlistItems/list#parameters
 		for {
 			// Retrieve next set of items in the playlist.
 			// Items are not returned in perfectly sorted order, so just go through all pages to get all items
 			// Revisit this if it gets too slow
-			playlistResponse := playlistItemsList(service, "snippet,ContentDetails", playlistId, nextPageToken)
+			playlistResponse := playlistItemsList(service, "snippet,ContentDetails", playlistId, nextPageToken, numItemsPerPage)
 			
 			for _, playlistItem := range playlistResponse.Items {
 				addNewVideosToList(playlistItem, knownVideos)
