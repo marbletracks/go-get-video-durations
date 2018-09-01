@@ -35,8 +35,6 @@ type videoMeta struct {
   VideoType MT3VideoType
 }
 
-}
-
 // from https://developers.google.com/youtube/v3/docs/videos/list
 // Used ONLY to get the Durations of videos because https://issuetracker.google.com/issues/35170788
 // Thanks https://stackoverflow.com/questions/15596753/youtube-api-v3-how-to-get-video-durations
