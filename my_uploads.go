@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 	"strings"	// needed to create a string of video IDs, separated by commas
-	// "regexp"		// will be needed to parse Titles when searching for "Live Stream:"
+	"regexp"	// will be needed to parse Titles when searching for "Live Stream:"
 	"bytes"		// for debugging Encoder
 	"os"		// for Encoder
 
@@ -68,6 +68,16 @@ func channelsListMine(service *youtube.Service, part string) *youtube.ChannelLis
 	return response
 }
 
+// this needs to return something, basically an enum
+func determineVideoTypeBasedOnTitle(title string) {
+	match, _ := regexp.MatchString("Live Stream:", title)
+	if match {
+		fmt.Printf("\"%v\" %v \r\n", title, match)
+	} else {
+		fmt.Printf("skipped\r\n")
+	}
+}
+
 // knownVideos is the list of videos in our local TOML file
 // playlistItem is one of the myriad videos in my channel
 // This looks at each video ID to see if we need to add it to knownVideos
@@ -92,6 +102,8 @@ func addNewVideosToList(playlistItem *youtube.PlaylistItem, knownVideos *tomlKno
 				Duration:vidDuration,
 			}
 	}
+	// this needs to return something, and go up inside videoMeta {}
+	determineVideoTypeBasedOnTitle(playlistItem.Snippet.Title)
 }
 
 // Download from Youtube all the videos in my channel
@@ -235,18 +247,4 @@ func main() {
 	fillInDurations(&knownVideos)
 
 	saveLocalKnownVideos(knownVideos)
-
-	// for _, video := range playlist {
-	// 	// sometimes Snippets are nil but I am not sure why
-	// 	if video.Snippet != nil {
-	// 		videoId := video.Snippet.ResourceId.VideoId
-	// 		title := video.Snippet.Title
-	// 		match, _ := regexp.MatchString("Live Stream:", title)
-	// 		if match {
-	// 			fmt.Printf("%v  \"%v\" %v \r\n", videoId, title, match)
-	// 		} else {
-	// 			fmt.Printf("%v skipped\r\n", title)
-	// 		}
-	// 	}
-	// }
 }
