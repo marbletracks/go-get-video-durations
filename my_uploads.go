@@ -78,7 +78,7 @@ func channelsListMine(service *youtube.Service, part string) *youtube.ChannelLis
 
 // this needs to return something, basically an enum
 func determineVideoTypeBasedOnTitle(title string) MT3VideoType {
-	match, _ := regexp.MatchString("Live Stream:", title)
+	match, _ := regexp.MatchString("Live Stream", title)
 	if match {
 		return Livestream
 	} else {
