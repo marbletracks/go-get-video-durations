@@ -170,12 +170,6 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 	}
 }
 
-func check(e error) {
-    if e != nil {
-        panic(e)
-    }
-}
-
 // for debugging, but not currently used
 func tomlPrintKnownVids(knownVideos tomlKnownVideos) {
 	buf := new(bytes.Buffer)

@@ -4,6 +4,12 @@ import (
   "log"
 )
 
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
+}
+
 func handleError(err error, message string) {
   if message == "" {
     message = "Error making API call"
