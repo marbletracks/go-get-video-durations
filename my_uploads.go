@@ -272,11 +272,7 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 func main() {
 	knownVideos := loadLocalKnownVideos()
 
-//	tomlPrintKnownVids(knownVideos)
-
 	loadNewVideosFromMyChannel(&knownVideos)		// send by reference because we will add new videos from Youtube
-
-//	tomlPrintKnownVids(knownVideos)
 
 	fillInDurations(&knownVideos)					// send by reference so we can update the Durations
 
