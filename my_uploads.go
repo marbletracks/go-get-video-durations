@@ -197,6 +197,7 @@ func returnUpTo50VideosWithEmptyDuration(knownVideos *tomlKnownVideos) string {
 }
 
 // This will fill in up to 50 videos at a time.  50 is the limit on how many videoIDs can be sent to get their metadata
+// Also get video title, which I should have changed soon after finishing the live stream
 func fillInDurations(knownVideos *tomlKnownVideos) {
 
 	client := getClient(youtube.YoutubeReadonlyScope)
@@ -206,7 +207,7 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 	videoIDs := returnUpTo50VideosWithEmptyDuration(knownVideos)
 
 	// Call async function to load the metadata for these video IDs
-	response := videosListMultipleIds(service, "contentDetails", videoIDs)
+	response := videosListMultipleIds(service, "snippet,contentDetails", videoIDs)
 
 	for _, item := range response.Items {
 		// Google returns a format like PT1H45M41S for the Duration
@@ -222,6 +223,7 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 		// but that gives an error.   Have to do this
 		vid := knownVideos.Videos[item.Id]
 		vid.Duration = vidDuration
+		vid.Title = item.Snippet.Title
 		knownVideos.Videos[item.Id] = vid
 	}
 }
