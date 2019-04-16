@@ -223,7 +223,7 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 		check(err)
 
 		// https://stackoverflow.com/a/17443950/194309
-		// I wanted to do this		knownVideos.Videos[item.Id].Duration = item.ContentDetails.Duration
+		// I wanted to do this     knownVideos.Videos[item.Id].Duration = item.ContentDetails.Duration
 		// but that gives an error.   Have to do this
 		vid := knownVideos.Videos[item.Id]
 		vid.Duration = vidDuration
