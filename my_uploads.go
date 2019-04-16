@@ -215,6 +215,10 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 		//    crop off the PT using [2:]
 		//    change to lower case
 		// to send something like this:  1h45m41s
+		if item.ContentDetails == nil {
+		   continue
+		}
+
 		vidDuration, err := time.ParseDuration(strings.ToLower(item.ContentDetails.Duration[2:]))
 		check(err)
 
