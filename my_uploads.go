@@ -86,7 +86,7 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 
 	client := getClient(youtube.YoutubeReadonlyScope)
 	service, err := youtube.New(client)
-	
+
 	// videoMeta data does not exist if there is no local data in knownvideos.toml
 	if knownVideos.Videos == nil {
 		knownVideos.Videos = make(map[string]videoMeta)
@@ -99,7 +99,7 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 
 	for _, channel := range response.Items {
 		playlistId := channel.ContentDetails.RelatedPlaylists.Uploads
-		
+
 		// Print the playlist ID for the list of uploaded videos.
 		fmt.Printf("Checking for new videos in list %s\r\n", playlistId)
 
@@ -111,7 +111,7 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 			// Items are not returned in perfectly sorted order, so just go through all pages to get all items
 			// Revisit this if it gets too slow
 			playlistResponse := playlistItemsList(service, "snippet,ContentDetails", playlistId, nextPageToken, numItemsPerPage)
-			
+
 			for _, playlistItem := range playlistResponse.Items {
 				foundNewVideos = addNewVideosToList(playlistItem, knownVideos)
 			}
@@ -219,6 +219,11 @@ func fillInDurations(knownVideos *tomlKnownVideos) {
 		   continue
 		}
 
+    if item.ContentDetails.Duration[2:] == "D" {
+		   fmt.Println("This video time duration is D, which fucks up the parser so just skip it")
+		   fmt.Println(item)
+		   continue
+		}
 		vidDuration, err := time.ParseDuration(strings.ToLower(item.ContentDetails.Duration[2:]))
 		check(err)
 
