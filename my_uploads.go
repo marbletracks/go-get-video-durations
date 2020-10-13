@@ -104,7 +104,7 @@ func loadNewVideosFromMyChannel(knownVideos *tomlKnownVideos) {
 		fmt.Printf("Checking for new videos in list %s\r\n", playlistId)
 
 		nextPageToken := ""
-		var numItemsPerPage int64 = 5			// max 50 https://developers.google.com/youtube/v3/docs/playlistItems/list#parameters
+		var numItemsPerPage int64 = 35			// max 50 https://developers.google.com/youtube/v3/docs/playlistItems/list#parameters
 		foundNewVideos := false					// if we added videos, we will look for next page of videos
 		for {
 			// Retrieve next set of items in the playlist.
