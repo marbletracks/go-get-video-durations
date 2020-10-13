@@ -41,7 +41,7 @@ type videoMeta struct {
 
 // this needs to return something, basically an enum
 func determineVideoTypeBasedOnTitle(title string) MT3VideoType {
-	match, _ := regexp.MatchString("Live Stream", title)
+	match, _ := regexp.MatchString(`[L|l]ive ?[S|s]tream`, title)
 	if match {
 		return Livestream
 	} else {
