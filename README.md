@@ -1,6 +1,12 @@
 
 README.ROB:
 
+    copy client_secrets.json or create anew via https://console.developers.google.com/start/api?id=youtube
+
+    sudo apt install golang-go
+    go get -u google.golang.org/api/youtube/v3
+    go get -u github.com/BurntSushi/toml
+
     cd ~/mt3.com/scripts/go
     go run my_uploads.go errors.go oauth2.go
 
